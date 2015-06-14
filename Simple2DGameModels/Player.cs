@@ -41,12 +41,12 @@ namespace Simple2DGameModels
         [RequiredComponent]
         public Transform2D trans2D;
 
-        private float _x;
-        private float _y;
+        private float _XPlayerPosition;
+        private float _YPlayerPosition;
         private PlayerOrientation _CurrentOrientation, _LastOrientation;
+        private PlayerState _CurrentState, _LastState;
         private int _XDirection;
         private int _YDirection;
-        private PlayerState _CurrentState, _LastState;
 
         public Player()
         {
@@ -91,11 +91,11 @@ namespace Simple2DGameModels
         {
             get
             {
-                return _x;
+                return _XPlayerPosition;
             }
             set
             {
-                _x = value;
+                _XPlayerPosition = value;
             }
         }
 
@@ -103,11 +103,11 @@ namespace Simple2DGameModels
         {
             get
             {
-                return _y;
+                return _YPlayerPosition;
             }
             set
             {
-                _y = value;
+                _YPlayerPosition = value;
             }
         }
 
@@ -188,121 +188,17 @@ namespace Simple2DGameModels
         protected override void Update(TimeSpan gameTime)
         {
             CurrentState = PlayerState.Idle;
-            
-            TouchInput();
+
             KeyboardInput();
 
             // Set current animation if that one is diferent
             if (CurrentState != LastState || CurrentOrientation != LastOrientation)
             {
-                switch (CurrentOrientation)
-                {
-                    case PlayerOrientation.North:
-                        anim2D.CurrentAnimation = "VerticalWalking";
-                        trans2D.Effect = SpriteEffects.FlipVertically;
-                        XDirection = 0;
-                        YDirection = -1;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.NorthEast:
-                        anim2D.CurrentAnimation = "DiagonalWalking";
-                        trans2D.Effect = SpriteEffects.FlipVertically;
-                        XDirection = 1;
-                        YDirection = -1;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.East:
-                        anim2D.CurrentAnimation = "HorizontalWalking";
-                        trans2D.Effect = SpriteEffects.None;
-                        XDirection = 1;
-                        YDirection = 0;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.SouthEast:
-                        anim2D.CurrentAnimation = "DiagonalWalking";
-                        trans2D.Effect = SpriteEffects.None;
-                        XDirection = 1;
-                        YDirection = 1;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.South:
-                        anim2D.CurrentAnimation = "VerticalWalking";
-                        trans2D.Effect = SpriteEffects.None;
-                        XDirection = 0;
-                        YDirection = 1;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.SouthWest:
-                        anim2D.CurrentAnimation = "DiagonalInvWalking";
-                        trans2D.Effect = SpriteEffects.None;
-                        XDirection = -1;
-                        YDirection = 1;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.West:
-                        anim2D.CurrentAnimation = "HorizontalWalking";
-                        XDirection = -1;
-                        YDirection = 0;
-                        trans2D.Effect = SpriteEffects.FlipHorizontally;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.NorthWest:
-                        anim2D.CurrentAnimation = "DiagonalInvWalking";
-                        trans2D.Effect = SpriteEffects.FlipVertically;
-                        XDirection = -1;
-                        YDirection = -1;
-                        anim2D.Play(true);
-                        break;
-                }
+                ChangePlayerSprite_Walking();
             }
             else if(CurrentState == PlayerState.Idle)
             {
-                XDirection = 0;
-                YDirection = 0;
-
-                switch (CurrentOrientation)
-                {
-                    case PlayerOrientation.North:
-                        anim2D.CurrentAnimation = "VerticalIdle";
-                        trans2D.Effect = SpriteEffects.FlipVertically;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.NorthEast:
-                        anim2D.CurrentAnimation = "DiagonalIdle";
-                        trans2D.Effect = SpriteEffects.FlipVertically;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.East:
-                        anim2D.CurrentAnimation = "HorizontalIdle";
-                        trans2D.Effect = SpriteEffects.None;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.SouthEast:
-                        anim2D.CurrentAnimation = "DiagonalIdle";
-                        trans2D.Effect = SpriteEffects.None;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.South:
-                        anim2D.CurrentAnimation = "VerticalIdle";
-                        trans2D.Effect = SpriteEffects.None;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.SouthWest:
-                        anim2D.CurrentAnimation = "DiagonalInvIdle";
-                        trans2D.Effect = SpriteEffects.None;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.West:
-                        anim2D.CurrentAnimation = "HorizontalIdle";
-                        trans2D.Effect = SpriteEffects.FlipHorizontally;
-                        anim2D.Play(true);
-                        break;
-                    case PlayerOrientation.NorthWest:
-                        anim2D.CurrentAnimation = "DiagonalInvIdle";
-                        trans2D.Effect = SpriteEffects.FlipVertically;
-                        anim2D.Play(true);
-                        break;
-                }
+                ChangePlayerSprite_Idle();
             }
 
             LastOrientation = CurrentOrientation;
@@ -312,7 +208,15 @@ namespace Simple2DGameModels
             trans2D.X += XDirection * MOVEMENT_SPEED * (gameTime.Milliseconds / 10);
             trans2D.Y += YDirection * MOVEMENT_SPEED * (gameTime.Milliseconds / 10);
 
-            // Check borders
+            XPlayerPosition = trans2D.X;
+            YPlayerPosition = trans2D.Y;
+
+            CheckScreenBorders();
+        }
+
+        private void CheckScreenBorders()
+        {
+            // Check X borders
             if (trans2D.X < XBORDER_OFFSET)
             {
                 trans2D.X = XBORDER_OFFSET;
@@ -322,6 +226,7 @@ namespace Simple2DGameModels
                 trans2D.X = WaveServices.Platform.ScreenWidth - XBORDER_OFFSET;
             }
 
+            // Check Y borders
             if (trans2D.Y < YBORDER_OFFSET)
             {
                 trans2D.Y = YBORDER_OFFSET;
@@ -329,6 +234,119 @@ namespace Simple2DGameModels
             else if (trans2D.Y > WaveServices.Platform.ScreenHeight - YBORDER_OFFSET)
             {
                 trans2D.Y = WaveServices.Platform.ScreenHeight - YBORDER_OFFSET;
+            }
+        }
+
+        private void ChangePlayerSprite_Idle()
+        {
+            XDirection = 0;
+            YDirection = 0;
+
+            switch (CurrentOrientation)
+            {
+                case PlayerOrientation.North:
+                    anim2D.CurrentAnimation = "VerticalIdle";
+                    trans2D.Effect = SpriteEffects.FlipVertically;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.NorthEast:
+                    anim2D.CurrentAnimation = "DiagonalIdle";
+                    trans2D.Effect = SpriteEffects.FlipVertically;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.East:
+                    anim2D.CurrentAnimation = "HorizontalIdle";
+                    trans2D.Effect = SpriteEffects.None;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.SouthEast:
+                    anim2D.CurrentAnimation = "DiagonalIdle";
+                    trans2D.Effect = SpriteEffects.None;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.South:
+                    anim2D.CurrentAnimation = "VerticalIdle";
+                    trans2D.Effect = SpriteEffects.None;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.SouthWest:
+                    anim2D.CurrentAnimation = "DiagonalInvIdle";
+                    trans2D.Effect = SpriteEffects.None;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.West:
+                    anim2D.CurrentAnimation = "HorizontalIdle";
+                    trans2D.Effect = SpriteEffects.FlipHorizontally;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.NorthWest:
+                    anim2D.CurrentAnimation = "DiagonalInvIdle";
+                    trans2D.Effect = SpriteEffects.FlipVertically;
+                    anim2D.Play(true);
+                    break;
+            }
+        }
+
+        private void ChangePlayerSprite_Walking()
+        {
+            switch (CurrentOrientation)
+            {
+                case PlayerOrientation.North:
+                    anim2D.CurrentAnimation = "VerticalWalking";
+                    trans2D.Effect = SpriteEffects.FlipVertically;
+                    XDirection = 0;
+                    YDirection = -1;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.NorthEast:
+                    anim2D.CurrentAnimation = "DiagonalWalking";
+                    trans2D.Effect = SpriteEffects.FlipVertically;
+                    XDirection = 1;
+                    YDirection = -1;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.East:
+                    anim2D.CurrentAnimation = "HorizontalWalking";
+                    trans2D.Effect = SpriteEffects.None;
+                    XDirection = 1;
+                    YDirection = 0;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.SouthEast:
+                    anim2D.CurrentAnimation = "DiagonalWalking";
+                    trans2D.Effect = SpriteEffects.None;
+                    XDirection = 1;
+                    YDirection = 1;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.South:
+                    anim2D.CurrentAnimation = "VerticalWalking";
+                    trans2D.Effect = SpriteEffects.None;
+                    XDirection = 0;
+                    YDirection = 1;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.SouthWest:
+                    anim2D.CurrentAnimation = "DiagonalInvWalking";
+                    trans2D.Effect = SpriteEffects.None;
+                    XDirection = -1;
+                    YDirection = 1;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.West:
+                    anim2D.CurrentAnimation = "HorizontalWalking";
+                    XDirection = -1;
+                    YDirection = 0;
+                    trans2D.Effect = SpriteEffects.FlipHorizontally;
+                    anim2D.Play(true);
+                    break;
+                case PlayerOrientation.NorthWest:
+                    anim2D.CurrentAnimation = "DiagonalInvWalking";
+                    trans2D.Effect = SpriteEffects.FlipVertically;
+                    XDirection = -1;
+                    YDirection = -1;
+                    anim2D.Play(true);
+                    break;
             }
         }
 
@@ -405,97 +423,6 @@ namespace Simple2DGameModels
                 {
                     CurrentOrientation = PlayerOrientation.West;
                     CurrentState = PlayerState.Walking;
-                }
-            }
-        }
-
-        private void TouchInput()
-        {
-            var touches = WaveServices.Input.TouchPanelState;
-            if (touches.Count > 0)
-            {
-                //CurrentState = PlayerState.Walking;
-
-                var firstTouch = touches[0];
-                float XTouch_Screen = firstTouch.Position.X; // --
-                float YTouch_Screen = firstTouch.Position.Y; // |
-
-                float XRealTouch = XPlayerPosition - XTouch_Screen;
-                float YRealTouch = YPlayerPosition - YTouch_Screen;
-
-                //if (XTouch_Screen < XPlayerPosition)
-                //{
-                //    XRealTouch = XRealTouch * -1;
-                //}
-
-                //if (YTouch_Screen < YPlayerPosition)
-                //{
-                //    YRealTouch = YRealTouch * -1;
-                //}
-
-                if (YRealTouch > 0)
-                {
-                    // Norht, East, West
-                    if (XRealTouch > 0)
-                    {
-                        // North, East
-                        if (YRealTouch < XRealTouch)
-                        {
-                            // East
-                            CurrentOrientation = PlayerOrientation.East;
-                        }
-                        else if (YRealTouch > XRealTouch)
-                        {
-                            // North
-                            CurrentOrientation = PlayerOrientation.North;
-                        }
-                    }
-                    else
-                    {
-                        // North, West
-                        if (YRealTouch > XRealTouch)
-                        {
-                            // North
-                            CurrentOrientation = PlayerOrientation.North;
-                        }
-                        else if (YRealTouch < XRealTouch)
-                        {
-                            // West
-                            CurrentOrientation = PlayerOrientation.West;
-                        }
-                    }
-                }
-                else
-                {
-                    // South, East, West
-                    if (XRealTouch > XPlayerPosition)
-                    {
-                        // South, East
-                        if (YPlayerPosition < YRealTouch)
-                        {
-                            // East
-                            CurrentOrientation = PlayerOrientation.East;
-                        }
-                        else if (YPlayerPosition > YRealTouch)
-                        {
-                            // South
-                            CurrentOrientation = PlayerOrientation.South;
-                        }
-                    }
-                    else
-                    {
-                        // South, West
-                        if (YPlayerPosition > YRealTouch) 
-                        {
-                            // West
-                            CurrentOrientation = PlayerOrientation.West;
-                        }
-                        else if (YPlayerPosition < YRealTouch)
-                        {
-                            // South
-                            CurrentOrientation = PlayerOrientation.South;
-                        }
-                    }
                 }
             }
         }

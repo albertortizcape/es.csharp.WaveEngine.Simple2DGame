@@ -27,16 +27,11 @@ namespace Simple2DGameProject
             };
             this.EntityManager.Add(camera2D);
 
-            // Poner fondo
+            // Set Background
             CreateBackGround();
 
-            // Poner monigote
+            // Set Monigote
             CreatePlayer();
-
-            // Recuadarar monigote para saber en que celda está con un color verduzco
-
-            // Darle capacidad de movimiento al monigote
-            // Poner obstaculos y respetarlos
         }
 
         private void CreatePlayer()
