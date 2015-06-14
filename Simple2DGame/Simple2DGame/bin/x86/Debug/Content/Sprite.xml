@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker http://www.codeandweb.com/texturepacker-->
+<!-- $TexturePacker:SmartUpdate:42e7e5148107d9addae2ee8039937bfe:afbc5c56198862bc1adc9e34a55487ab:6e18b06d4328e3caf900b3f3d26033af$ -->
+<!--Format:
+n  => name of the sprite
+x  => sprite x pos in texture
+y  => sprite y pos in texture
+w  => sprite width (may be trimmed)
+h  => sprite height (may be trimmed)
+pX => x pos of the pivot point (relative to sprite width)
+pY => y pos of the pivot point (relative to sprite height)
+oX => sprite's x-corner offset (only available if trimmed)
+oY => sprite's y-corner offset (only available if trimmed)
+oW => sprite's original width (only available if trimmed)
+oH => sprite's original height (only available if trimmed)
+r => 'y' only set if sprite is rotated
+-->
+<TextureAtlas imagePath="Sprite.png" width="775" height="69">
+    <sprite n="MonigoteDiagonal.png" x="130" y="2" w="65" h="64" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteDiagonalInv.png" x="2" y="2" w="64" h="65" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteDiagonalInvWalking1.png" x="512" y="2" w="64" h="60" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteDiagonalInvWalking2.png" x="68" y="2" w="60" h="65" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteDiagonalWalking1.png" x="197" y="2" w="60" h="64" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteDiagonalWalking2.png" x="445" y="2" w="65" h="60" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteHorizontal.png" x="578" y="2" w="64" h="60" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteHorizontalWalking1.png" x="644" y="2" w="64" h="60" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteHorizontalWalking2.png" x="710" y="2" w="63" h="60" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteVertical.png" x="259" y="2" w="60" h="64" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteVerticalWalking1.png" x="321" y="2" w="60" h="64" pX="0.5" pY="0.5"/>
+    <sprite n="MonigoteVerticalWalking2.png" x="383" y="2" w="60" h="63" pX="0.5" pY="0.5"/>
+</TextureAtlas>
